@@ -33,4 +33,12 @@ public:
     void LookUp(float Value);
 
     void Turn(float Value);
+
+private:
+
+    UPROPERTY(EditInstanceOnly)
+    float LookSensitivity;
+
+    UPROPERTY(EditInstanceOnly)
+    float MoveSpeed;
 };
