@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "EnemyCharacter.h"
 #include "AIManager.generated.h"
 
 UCLASS()
@@ -25,7 +24,7 @@ public:
     TArray<ANavigationNode*> AllNodes;
 
     UPROPERTY(VisibleAnywhere, Category = "Agents")
-    TArray<AEnemyCharacter*> AllAgents;
+    TArray<class AEnemyCharacter*> AllAgents;
 
     UPROPERTY(EditAnywhere, Category = "Agents")
     TSubclassOf<AEnemyCharacter> AgentToSpawn;
@@ -41,5 +40,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+private:
+
+    TArray<ANavigationNode*> OpenSet;
 
 };

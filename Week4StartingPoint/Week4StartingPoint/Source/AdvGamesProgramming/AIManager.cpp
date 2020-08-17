@@ -4,6 +4,8 @@
 #include "AIManager.h"
 #include "EngineUtils.h"
 #include "NavigationNode.h"
+#include "Math/NumericLimits.h"
+#include "EnemyCharacter.h"
 
 // Sets default values
 AAIManager::AAIManager()
@@ -17,6 +19,7 @@ AAIManager::AAIManager()
 void AAIManager::BeginPlay()
 {
 	Super::BeginPlay();
+    OpenSet = TArray<ANavigationNode*>();
     PopulateNodes();
     CreateAgents();
 }
@@ -28,20 +31,74 @@ void AAIManager::Tick(float DeltaTime)
 
 }
 
-TArray<class ANavigationNode*> AAIManager::GeneratePath(ANavigationNode* StartNode, ANavigationNode* EndNode) {
+
+TArray<ANavigationNode*> AAIManager::GeneratePath(ANavigationNode* StartNode, ANavigationNode* EndNode)
+{
+    OpenSet.Add(StartNode);
+
+    for (auto It = AllNodes.CreateConstIterator(); It; ++It)
+    {
+        (*It)->GScore = TNumericLimits<float>::Max();
+    }
+
+    StartNode->GScore = 0;
+    StartNode->HScore = FVector::Dist(StartNode->GetActorLocation(), EndNode->GetActorLocation());
+
+    while (OpenSet.Num() > 0)
+    {
+        Algo::SortBy(OpenSet, &ANavigationNode::FScore);
+        ANavigationNode* CurrentNode = OpenSet.Pop();
+
+        if (CurrentNode == EndNode)
+        {
+            TArray<ANavigationNode*> Path = TArray<ANavigationNode*>();
+
+            while (CurrentNode != StartNode) {
+                Path.Push(CurrentNode);
+                CurrentNode = CurrentNode->CameFrom;
+            }
+            return Path;
+        }
+
+        for (auto It = CurrentNode->ConnectedNodes.CreateConstIterator(); It; ++It)
+        {
+            ANavigationNode* ConnectedNode = *It;
+            float TentativeGScore = CurrentNode->GScore + FVector::Dist(CurrentNode->GetActorLocation(),
+                                                                        ConnectedNode->GetActorLocation());
+
+            if (TentativeGScore < ConnectedNode->GScore)
+            {
+                ConnectedNode->CameFrom = CurrentNode;
+                ConnectedNode->GScore = TentativeGScore;
+                ConnectedNode->HScore = FVector::Dist(ConnectedNode->GetActorLocation(),
+                                                      EndNode->GetActorLocation());
+                if (!OpenSet.Contains(ConnectedNode))
+                {
+                    OpenSet.Add(ConnectedNode);
+                }
+            }
+        }
+    }
     return TArray<ANavigationNode*>();
 }
 
-void AAIManager::PopulateNodes() {
-    for (TActorIterator<ANavigationNode> It(GetWorld()); It; ++It) {
+
+void AAIManager::PopulateNodes()
+{
+    for (TActorIterator<ANavigationNode> It(GetWorld()); It; ++It)
+    {
         AllNodes.Add(*It);
     }
 }
 
-void AAIManager::CreateAgents() {
-    for (int I = 0; I < NumAI; I++) {
+void AAIManager::CreateAgents()
+{
+    for (int I = 0; I < NumAI; I++)
+    {
         ANavigationNode* RandomLocation = AllNodes[FMath::RandRange(0, AllNodes.Num() - 1)];
-        GetWorld()->SpawnActor<AEnemyCharacter>(AgentToSpawn,RandomLocation->GetActorLocation(),
+        AEnemyCharacter* Agent = GetWorld()->SpawnActor<AEnemyCharacter>(AgentToSpawn, RandomLocation->GetActorLocation(),
                                                 RandomLocation->GetActorRotation());
+        Agent->Manager = this;
+        Agent->CurrentNode = RandomLocation;
     }
 }
