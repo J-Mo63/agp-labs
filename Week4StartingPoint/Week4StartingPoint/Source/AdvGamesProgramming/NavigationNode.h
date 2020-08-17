@@ -20,6 +20,14 @@ public:
 
     USceneComponent* LocationComponent;
 
+    float GScore;
+
+    float HScore;
+
+    float FScore();
+
+    ANavigationNode* CameFrom;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -31,3 +31,6 @@ void ANavigationNode::Tick(float DeltaTime)
 
 }
 
+float ANavigationNode::FScore() {
+    return GScore + HScore;
+}
