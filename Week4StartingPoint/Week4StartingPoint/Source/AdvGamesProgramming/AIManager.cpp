@@ -55,6 +55,7 @@ TArray<ANavigationNode*> AAIManager::GeneratePath(ANavigationNode* StartNode, AN
 
             while (CurrentNode != StartNode) {
                 Path.Push(CurrentNode);
+                check(CurrentNode) // Debug check for null node
                 CurrentNode = CurrentNode->CameFrom;
             }
             return Path;

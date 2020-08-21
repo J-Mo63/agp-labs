@@ -43,8 +43,13 @@ void AEnemyCharacter::Tick(float DeltaTime)
 	}
 	else
     {
-        Path = Manager->GeneratePath(
-                CurrentNode,Manager->AllNodes[FMath::RandRange(0, Manager->AllNodes.Num() - 1)]);
+	    // Get a random node in the graph, and make sure its not the same as the current node
+	    ANavigationNode* EndNode = Manager->AllNodes[FMath::RandRange(0, Manager->AllNodes.Num() - 1)];
+	    if (CurrentNode == EndNode)
+        {
+            EndNode = EndNode->ConnectedNodes[0];
+        }
+        Path = Manager->GeneratePath(CurrentNode, EndNode);
     }
 }
 
