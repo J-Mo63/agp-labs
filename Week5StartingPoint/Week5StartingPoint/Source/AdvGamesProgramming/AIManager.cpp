@@ -112,20 +112,35 @@ void AAIManager::CreateAgents()
 	}
 }
 
+
+
+/*
+ * This function has an O(n) complexity based on the total number of navnodes in
+ * the scene - adding more navnodes will increase complexity greatly. Additionally
+ * it does not take into account connectedness or LoS, rendering it fairly poor for
+ * real world use as part of projectile combat pathfinding.
+ */
 ANavigationNode* AAIManager::FindNearestNode(const FVector& Location)
 {
+    // Set current to null and nearest to max float
 	ANavigationNode* NearestNode = nullptr;
 	float NearestDistance = TNumericLimits<float>::Max();
+
 	//Loop through the nodes and find the nearest one in distance
-	for (ANavigationNode* CurrentNode : AllNodes)
+	for (ANavigationNode* CurrentNode : AllNodes) // May be better to use iterators for pointer-arithmetic efficiency
 	{
+	    // Get the distance to specified location
 		float CurrentNodeDistance = FVector::Distance(Location, CurrentNode->GetActorLocation());
+
+		// If it's nearer than the current nearest, then set it as the new nearest
 		if (CurrentNodeDistance < NearestDistance)
 		{
 			NearestDistance = CurrentNodeDistance;
 			NearestNode = CurrentNode;
 		}
 	}
+
+	// Log and return
 	UE_LOG(LogTemp, Error, TEXT("Nearest Node: %s"), *NearestNode->GetName())
 	return NearestNode;
 }

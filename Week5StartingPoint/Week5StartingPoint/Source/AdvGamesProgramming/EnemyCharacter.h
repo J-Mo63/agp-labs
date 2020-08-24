@@ -44,6 +44,8 @@ public:
 
     UAIPerceptionComponent* PerceptionComponent;
 
+    class UHealthComponent* HealthComponent;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -56,5 +58,9 @@ public:
 
     UFUNCTION(BlueprintImplementableEvent)
     void Fire(FVector FireDirection);
+
+private:
+
+    void MoveAlongPath();
 
 };

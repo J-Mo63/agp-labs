@@ -47,3 +47,8 @@ void UHealthComponent::OnDeath()
 {
 
 }
+
+float UHealthComponent::HealthPercentageRemaining()
+{
+    return CurrentHealth/MaxHealth;
+}

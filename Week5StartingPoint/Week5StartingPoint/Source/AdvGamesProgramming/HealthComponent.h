@@ -35,4 +35,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnDeath();
+
+    float HealthPercentageRemaining();
 };
