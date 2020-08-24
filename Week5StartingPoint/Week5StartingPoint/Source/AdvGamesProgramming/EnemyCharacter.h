@@ -6,6 +6,7 @@
 #include "NavigationNode.h"
 #include "GameFramework/Character.h"
 #include "AIManager.h"
+#include "Perception/AIPerceptionComponent.h"
 #include "EnemyCharacter.generated.h"
 
 UENUM()
@@ -33,7 +34,15 @@ public:
 	AAIManager* Manager;
 
     UPROPERTY(VisibleAnywhere)
+    AActor* DetectedActor;
+
+    UPROPERTY(VisibleAnywhere)
+    bool bCanSeeActor;
+
+    UPROPERTY(VisibleAnywhere)
 	AgentState CurrentAgentState;
+
+    UAIPerceptionComponent* PerceptionComponent;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -41,5 +50,11 @@ public:
 	void AgentPatrol();
 	void AgentEngage();
     void AgentEvade();
+
+    UFUNCTION()
+    void SensePlayer(AActor* ActorSensed, FAIStimulus Stimulus);
+
+    UFUNCTION(BlueprintImplementableEvent)
+    void Fire(FVector FireDirection);
 
 };

@@ -12,19 +12,26 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
     CurrentAgentState = AgentState::PATROL;
+    DetectedActor = nullptr;
+    bCanSeeActor = false;
 }
 
 // Called when the game starts or when spawned
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+    PerceptionComponent = FindComponentByClass<UAIPerceptionComponent>();
+    if (!PerceptionComponent) {UE_LOG(LogTemp, Error, TEXT("NO PERCEPTION COMPONENT FOUND")) };
+    PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyCharacter::SensePlayer);
 }
 
 // Called every frame
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+    Fire(FVector::ZeroVector);
 
 	if (Path.Num() == 0 && Manager != NULL)
 	{
@@ -75,4 +82,19 @@ void AEnemyCharacter::AgentEngage()
 void AEnemyCharacter::AgentEvade()
 {
 
+}
+
+void AEnemyCharacter::SensePlayer(AActor* ActorSensed, FAIStimulus Stimulus)
+{
+    if (Stimulus.WasSuccessfullySensed())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Player Detected"))
+        DetectedActor = ActorSensed;
+        bCanSeeActor = true;
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Player Lost"))
+        bCanSeeActor = false;
+    }
 }
