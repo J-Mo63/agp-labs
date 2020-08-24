@@ -8,6 +8,9 @@
 #include "AIManager.h"
 #include "EnemyCharacter.generated.h"
 
+UENUM()
+enum class AgentState : uint8 {PATROL, ENGAGE, EVADE};
+
 UCLASS()
 class ADVGAMESPROGRAMMING_API AEnemyCharacter : public ACharacter
 {
@@ -29,7 +32,14 @@ public:
 	ANavigationNode* CurrentNode;
 	AAIManager* Manager;
 
+    UPROPERTY(VisibleAnywhere)
+	AgentState CurrentAgentState;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void AgentPatrol();
+	void AgentEngage();
+    void AgentEvade();
 
 };

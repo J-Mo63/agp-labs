@@ -10,6 +10,8 @@ AEnemyCharacter::AEnemyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+    CurrentAgentState = AgentState::PATROL;
 }
 
 // Called when the game starts or when spawned
@@ -60,3 +62,17 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
+void AEnemyCharacter::AgentPatrol()
+{
+
+}
+
+void AEnemyCharacter::AgentEngage()
+{
+
+}
+
+void AEnemyCharacter::AgentEvade()
+{
+
+}
