@@ -13,6 +13,7 @@ AProcedurallyGeneratedMap::AProcedurallyGeneratedMap()
 
     PerlinScale = 1000.0f;
     PerlinRoughness = 0.1f;
+    bRegenerateMap = false;
 }
 
 // Called when the game starts or when spawned
@@ -38,8 +39,6 @@ void AProcedurallyGeneratedMap::BeginPlay()
 //
 //    MeshComponent->CreateMeshSection(0, Vertices, Triangles, TArray<FVector>(),
 //            UVCoords, TArray<FColor>(), TArray<FProcMeshTangent>(), true);
-
-    GenerateMap();
 }
 
 // Called every frame
@@ -47,6 +46,17 @@ void AProcedurallyGeneratedMap::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+    if (bRegenerateMap)
+    {
+        ClearMap();
+        GenerateMap();
+        bRegenerateMap = false;
+    }
+}
+
+bool AProcedurallyGeneratedMap::ShouldTickIfViewportsOnly() const
+{
+    return true;
 }
 
 void AProcedurallyGeneratedMap::GenerateMap()
@@ -80,8 +90,10 @@ void AProcedurallyGeneratedMap::GenerateMap()
         }
     }
 
-    MeshComponent->CreateMeshSection(0, Vertices, Triangles, TArray<FVector>(),
-            UVCoords, TArray<FColor>(), TArray<FProcMeshTangent>(), true);
+    UKismetProceduralMeshLibrary::CalculateTangentsForMesh(Vertices, Triangles, UVCoords, Normals, Tangents);
+
+    MeshComponent->CreateMeshSection(0, Vertices, Triangles, Normals,
+            UVCoords, TArray<FColor>(), Tangents, true);
 }
 
 void AProcedurallyGeneratedMap::ClearMap()

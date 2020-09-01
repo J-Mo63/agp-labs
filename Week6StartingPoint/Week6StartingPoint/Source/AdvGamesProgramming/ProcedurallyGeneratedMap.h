@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
+#include "KismetProceduralMeshLibrary.h"
 #include "ProcedurallyGeneratedMap.generated.h"
 
 UCLASS()
@@ -24,10 +25,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+    virtual bool ShouldTickIfViewportsOnly() const override;
+
 	UFUNCTION(BlueprintCallable)
     void GenerateMap();
 
     void ClearMap();
+
+    UPROPERTY(EditAnywhere)
+    bool bRegenerateMap;
 
     UPROPERTY(EditAnywhere)
     float PerlinScale;
@@ -55,4 +61,10 @@ public:
 
     UPROPERTY(VisibleAnywhere)
     TArray<FVector2D> UVCoords;
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<FVector> Normals;
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<FProcMeshTangent> Tangents;
 };
