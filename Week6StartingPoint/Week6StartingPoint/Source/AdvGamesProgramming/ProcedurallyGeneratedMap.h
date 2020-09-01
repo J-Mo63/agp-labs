@@ -24,7 +24,35 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+    void GenerateMap();
+
+    void ClearMap();
+
+    UPROPERTY(EditAnywhere)
+    float PerlinScale;
+
+    UPROPERTY(EditAnywhere)
+    float PerlinRoughness;
+
 	UPROPERTY(VisibleAnywhere)
     UProceduralMeshComponent* MeshComponent;
 
+    UPROPERTY(EditAnywhere)
+    int32 Width;
+
+    UPROPERTY(EditAnywhere)
+    int32 Height;
+
+    UPROPERTY(EditAnywhere)
+    float GridSize;
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<FVector> Vertices;
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<int32> Triangles;
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<FVector2D> UVCoords;
 };
