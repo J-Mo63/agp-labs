@@ -2,6 +2,7 @@
 
 
 #include "ProcedurallyGeneratedMap.h"
+#include "AIManager.h"
 
 // Sets default values
 AProcedurallyGeneratedMap::AProcedurallyGeneratedMap()
@@ -94,6 +95,9 @@ void AProcedurallyGeneratedMap::GenerateMap()
 
     MeshComponent->CreateMeshSection(0, Vertices, Triangles, Normals,
             UVCoords, TArray<FColor>(), Tangents, true);
+
+    if (!AIManager) { return; }
+    AIManager->GenerateNodes(Vertices, Width, Height);
 }
 
 void AProcedurallyGeneratedMap::ClearMap()

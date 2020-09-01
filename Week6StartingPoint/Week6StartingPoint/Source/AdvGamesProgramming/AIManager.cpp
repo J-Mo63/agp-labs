@@ -13,6 +13,7 @@ AAIManager::AAIManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	AllowedAngle = 0.4;
 }
 
 // Called when the game starts or when spawned
@@ -149,3 +150,59 @@ ANavigationNode* AAIManager::FindFurthestNode(const FVector& Location)
 	return FurthestNode;
 }
 
+void AAIManager::GenerateNodes(const TArray<FVector> Vertices, int32 Width, int32 Height)
+{
+    AllNodes.Empty();
+    for (TActorIterator<ANavigationNode> It(GetWorld()); It; ++It)
+    {
+        (*It)->Destroy();
+    }
+
+    for (auto It = Vertices.CreateConstIterator(); It; It++)
+    {
+        ANavigationNode* NewNode = GetWorld()->SpawnActor<ANavigationNode>(
+                *It,
+                FRotator::ZeroRotator,
+                FActorSpawnParameters());
+        AllNodes.Add(NewNode);
+    }
+
+    for (int Row = 0; Row < Height; Row++)
+    {
+        for (int Col = 0; Col < Width; Col++)
+        {
+            int32 CurrentIdx = Row * Width + Col;
+
+            if (Col > 0)
+            {
+                AddConnection(AllNodes[CurrentIdx], AllNodes[Row * Width + Col-1]);
+            }
+
+            if (Col < Width - 1)
+            {
+                AddConnection(AllNodes[CurrentIdx], AllNodes[Row * Width + Col+1]);
+            }
+
+            if (Row > 0)
+            {
+                AddConnection(AllNodes[CurrentIdx], AllNodes[(Row-1) * Width + Col]);
+            }
+
+            if (Row < Height - 1)
+            {
+                AddConnection(AllNodes[CurrentIdx], AllNodes[(Row+1) * Width + Col]);
+            }
+        }
+    }
+
+}
+
+void AAIManager::AddConnection(ANavigationNode* FromNode, ANavigationNode* ToNode)
+{
+    FVector Direction = FromNode->GetActorLocation() - ToNode->GetActorLocation();
+    Direction.Normalize();
+    if (Direction.Z < AllowedAngle && Direction.Z > -AllowedAngle)
+    {
+        FromNode->ConnectedNodes.Add(ToNode);
+    }
+}

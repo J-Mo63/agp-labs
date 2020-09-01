@@ -33,6 +33,9 @@ public:
     void ClearMap();
 
     UPROPERTY(EditAnywhere)
+    class AAIManager* AIManager;
+
+    UPROPERTY(EditAnywhere)
     bool bRegenerateMap;
 
     UPROPERTY(EditAnywhere)
