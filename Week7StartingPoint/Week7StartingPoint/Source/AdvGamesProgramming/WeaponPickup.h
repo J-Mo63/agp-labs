@@ -15,6 +15,14 @@ enum class WeaponPickupRarity : uint8
     COMMON
 };
 
+enum WeaponStats : uint8
+{
+    DAMAGE   = 0,
+    VELOCITY = 1,
+    MAGAZINE = 2,
+    ACCURACY = 3,
+};
+
 UCLASS()
 class ADVGAMESPROGRAMMING_API AWeaponPickup : public APickup
 {
@@ -25,7 +33,11 @@ public:
     UFUNCTION(BlueprintImplementableEvent)
     void OnPickup(AActor* ActorThatPickedUp) override;
 
+    UFUNCTION()
     void OnGenerate() override;
+
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+    WeaponPickupRarity Rarity;
 
     UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
     float BulletDamage;

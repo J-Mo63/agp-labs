@@ -23,8 +23,8 @@ APickup::APickup()
 // Called when the game starts or when spawned
 void APickup::BeginPlay()
 {
+    OnGenerate();
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -37,6 +37,7 @@ void APickup::Tick(float DeltaTime)
 void APickup::OnEnterPickup(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     UE_LOG(LogTemp, Warning, TEXT("Overlap Event"))
+    OnPickup(OtherActor);
 }
 
 void APickup::OnPickup(AActor* ActorThatPickedUp)
