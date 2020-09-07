@@ -52,6 +52,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	bool bCanSeeActor;
 
+    UPROPERTY(EditAnywhere, meta=(UIMin = "10.0", UIMax = "1000.0", ClampMin = "10.0", ClampMax = "1000.0"))
+    float PathfindingNodeAccuracy;
+
 	UHealthComponent* HealthComponent;
 
 	UFUNCTION()
