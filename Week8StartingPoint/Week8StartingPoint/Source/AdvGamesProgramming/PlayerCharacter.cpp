@@ -5,18 +5,20 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	bUseControllerRotationPitch = true;
 
 	LookSensitivity = 1.0f;
 	SprintMultiplier = 1.5f;
+
+    NormalMovementSpeed = GetCharacterMovement()->MaxWalkSpeed;
+    SprintMovementSpeed = NormalMovementSpeed * SprintMultiplier;
 }
 
 // Called when the game starts or when spawned
@@ -85,11 +87,22 @@ void APlayerCharacter::Turn(float Value)
 
 void APlayerCharacter::SprintStart()
 {
-	GetCharacterMovement()->MaxWalkSpeed *= SprintMultiplier;
+    GetCharacterMovement()->MaxWalkSpeed = SprintMovementSpeed;
+    ServerSprintStart();
 }
 
 void APlayerCharacter::SprintEnd()
 {
-	GetCharacterMovement()->MaxWalkSpeed /= SprintMultiplier;
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
+    ServerSprintEnd();
 }
 
+void APlayerCharacter::ServerSprintStart_Implementation()
+{
+    GetCharacterMovement()->MaxWalkSpeed = SprintMovementSpeed;
+}
+
+void APlayerCharacter::ServerSprintEnd_Implementation()
+{
+    GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
+}

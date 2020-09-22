@@ -20,6 +20,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	float SprintMovementSpeed;
+
+	float NormalMovementSpeed;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -34,6 +38,12 @@ public:
 
 	void SprintStart();
 	void SprintEnd();
+
+    UFUNCTION(Server, Reliable)
+    void ServerSprintStart();
+
+    UFUNCTION(Server, Reliable)
+    void ServerSprintEnd();
 
 private:
 	UPROPERTY(EditInstanceOnly, meta = (ClampMin="0.0", ClampMax="2.0", UIMin ="0.0", UIMax="2.0"))
