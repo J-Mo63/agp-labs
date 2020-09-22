@@ -66,6 +66,8 @@ void APlayerCharacter::Strafe(float Value)
 
 void APlayerCharacter::LookUp(float Value)
 {
+    if (!Camera) { return; }
+
 	FRotator DeltaRotation = FRotator::ZeroRotator;
 	DeltaRotation.Pitch = Value * LookSensitivity;
 	//Bonus Task - Removing Stutter by only adding relative rotation if it does not push pitch above or below 90 or -90 respectively
@@ -91,7 +93,7 @@ void APlayerCharacter::SprintStart()
     ServerSprintStart();
 }
 
-void APlayerCharacter::SprintEnd()
+void APlayerCharacter::SprintEnd( )
 {
     GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
     ServerSprintEnd();
