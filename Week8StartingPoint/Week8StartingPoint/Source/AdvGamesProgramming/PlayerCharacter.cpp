@@ -4,6 +4,7 @@
 #include "PlayerCharacter.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HealthComponent.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
 
@@ -27,6 +28,11 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	Camera = FindComponentByClass<UCameraComponent>();
+    HealthComponent = FindComponentByClass<UHealthComponent>();
+    if (HealthComponent)
+    {
+        HealthComponent->SetIsReplicated(true);
+    }
 }
 
 // Called every frame

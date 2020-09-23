@@ -45,6 +45,8 @@ public:
     UFUNCTION(Server, Reliable)
     void ServerSprintEnd();
 
+    class UHealthComponent* HealthComponent;
+
 private:
 	UPROPERTY(EditInstanceOnly, meta = (ClampMin="0.0", ClampMax="2.0", UIMin ="0.0", UIMax="2.0"))
 	float LookSensitivity;
