@@ -23,7 +23,7 @@ APickup::APickup()
 void APickup::BeginPlay()
 {
 	Super::BeginPlay();
-	
+    OnGenerate();
 }
 
 // Called every frame

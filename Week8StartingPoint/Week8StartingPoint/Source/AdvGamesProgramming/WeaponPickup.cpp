@@ -2,10 +2,18 @@
 
 #include "Kismet/KismetArrayLibrary.h"
 #include "WeaponPickup.h"
+#include "Net/UnrealNetwork.h"
+
+AWeaponPickup::AWeaponPickup()
+{
+    PrimaryActorTick.bCanEverTick = true;
+    bReplicates = true;
+}
 
 void AWeaponPickup::OnGenerate()
 {
-	APickup::OnGenerate();
+	if (!HasAuthority()) { return; }
+
 	//Pick a weapon rarity tier:
 	//LEGENDARY = 5% chance
 	//MASTER = 15% chance
@@ -41,6 +49,17 @@ void AWeaponPickup::OnGenerate()
 	MuzzleVelocity = (RandBoolArray[1] ? FMath::RandRange(10000.0f, 20000.0f) : FMath::RandRange(5000.0f, 10000.0f));
 	MagazineSize = (RandBoolArray[2] ? FMath::RandRange(20, 100) : FMath::RandRange(1, 20));
 	WeaponAccuracy = (RandBoolArray[3] ? FMath::RandRange(100.0f, 1000.0f) : FMath::RandRange(20.0f, 80.0f));
+}
+
+void AWeaponPickup::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AWeaponPickup, Rarity);
+    DOREPLIFETIME(AWeaponPickup, BulletDamage);
+    DOREPLIFETIME(AWeaponPickup, MuzzleVelocity);
+    DOREPLIFETIME(AWeaponPickup, MagazineSize);
+    DOREPLIFETIME(AWeaponPickup, WeaponAccuracy);
 }
 
 void AWeaponPickup::GenerateRandBooleanArray(int32 ArrayLength, int32 NumTrue, TArray<bool>& RandBoolArray)
