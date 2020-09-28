@@ -13,5 +13,17 @@ UCLASS()
 class ADVGAMESPROGRAMMING_API AMultiplayerGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
+public:
+
+    UPROPERTY(EditDefaultsOnly)
+    TSubclassOf<class APickup> WeaponPickupClass;
+
+    void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessages) override;
+
+private:
+
+    class AProcedurallyGeneratedMap* ProceduralMap;
+    class APickupManager* PickupManager;
+
 };

@@ -2,9 +2,9 @@
 
 
 #include "PickupManager.h"
-#include "Engine/World.h"
 #include "Pickup.h"
 #include "Engine/GameEngine.h"
+#include "TimerManager.h"
 
 // Sets default values
 APickupManager::APickupManager()
@@ -18,7 +18,9 @@ APickupManager::APickupManager()
 void APickupManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+    GetWorldTimerManager().SetTimer(WeaponSpawnTimer, this, &APickupManager::SpawnWeaponPickup,
+                                    FrequencyOfWeaponPickupSpawns, true, 0.0f);
 }
 
 void APickupManager::Init(const TArray<FVector>& SpawnLocations, TSubclassOf<class APickup> WeaponPickup, float FrequencyOfSpawn)
@@ -38,7 +40,8 @@ void APickupManager::Tick(float DeltaTime)
 void APickupManager::SpawnWeaponPickup()
 {
     FVector SpawnLocation = PossibleSpawnLocations[FMath::RandRange(0, PossibleSpawnLocations.Num()-1)];
-    APickup* WeaponPickup = GetWorld()->SpawnActor<APickup>(WeaponPickupClass, SpawnLocation, FRotator::ZeroRotator);
+    APickup* WeaponPickup = GetWorld()->SpawnActor<APickup>(
+            WeaponPickupClass,SpawnLocation + FVector(0.f, 0.f, 60.f), FRotator::ZeroRotator);
     WeaponPickup->SetLifeSpan(20.0f);
 
     if (GEngine)
