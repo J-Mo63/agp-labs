@@ -4,6 +4,8 @@
 #include "HealthComponent.h"
 #include "Engine/GameEngine.h"
 #include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
+#include "PlayerHUD.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -67,4 +69,18 @@ void UHealthComponent::OnDeath()
 float UHealthComponent::HealthPercentageRemaining()
 {
 	return CurrentHealth / MaxHealth;
+}
+
+void UHealthComponent::UpdateHealthBar()
+{
+    if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+    {
+        APlayerHUD* HUD = Cast<APlayerHUD>(UGameplayStatics::GetPlayerController(
+                GetWorld(), 0)->GetHUD());
+
+        if (HUD)
+        {
+            HUD->SetPlayerHealthBarPercent(HealthPercentageRemaining());
+        }
+    }
 }

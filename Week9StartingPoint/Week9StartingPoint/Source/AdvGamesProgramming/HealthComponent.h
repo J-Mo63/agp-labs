@@ -29,7 +29,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
 
-	UPROPERTY(Replicated, BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing = UpdateHealthBar, BlueprintReadOnly)
 	float CurrentHealth;
 
 	UFUNCTION(BlueprintCallable)
@@ -39,4 +39,11 @@ public:
 	void OnDeath();
 
 	float HealthPercentageRemaining();
+
+private:
+
+    UFUNCTION()
+    void UpdateHealthBar();
+
 };
+
