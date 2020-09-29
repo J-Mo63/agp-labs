@@ -18,6 +18,8 @@ public:
 
     APlayerHUD();
 
+    void DisplayHUD(bool bDrawHUD);
+
 	void SetPlayerHealthBarPercent(float Percent);
 
 	UFUNCTION(BlueprintCallable)

@@ -40,6 +40,7 @@ public:
 
 	class UHealthComponent* HealthComponent;
 
+
 	/**
 	 * Will adjust the movement speed of the server character to sprinting
 	 */
@@ -51,6 +52,8 @@ public:
 	 */
 	UFUNCTION(Server, Reliable)
 	void ServerSprintEnd();
+
+	void OnDeath();
 
 private:
 	UPROPERTY(EditInstanceOnly, meta = (ClampMin="0.0", ClampMax="2.0", UIMin ="0.0", UIMax="2.0"))

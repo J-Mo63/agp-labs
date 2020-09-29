@@ -24,6 +24,11 @@ APlayerHUD::APlayerHUD()
     }
 }
 
+void APlayerHUD::DisplayHUD(bool bShow)
+{
+    CurrentPlayerHUDWidget->SetVisibility(bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
 void APlayerHUD::SetPlayerHealthBarPercent(float Percent)
 {
     if (!HealthProgressBar) { return; }

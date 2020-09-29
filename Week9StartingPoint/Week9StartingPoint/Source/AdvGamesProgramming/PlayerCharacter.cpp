@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
 #include "HealthComponent.h"
+#include "MultiplayerGameMode.h"
+#include "MultiplayerPlayerController.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -118,3 +120,11 @@ void APlayerCharacter::ServerSprintEnd_Implementation()
 	GetCharacterMovement()->MaxWalkSpeed = NormalMovementSpeed;
 }
 
+void APlayerCharacter::OnDeath()
+{
+    if (GetOwner() && GetOwner()->GetLocalRole() == ROLE_Authority)
+    {
+        AMultiplayerGameMode* GameMode = Cast<AMultiplayerGameMode>(GetWorld()->GetAuthGameMode());
+        GameMode->Respawn(Cast<AMultiplayerPlayerController>(GetController()));
+    }
+}

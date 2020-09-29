@@ -21,9 +21,18 @@ public:
 
     void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessages) override;
 
+    void Respawn(class AMultiplayerPlayerController* Controller);
+
+    UFUNCTION()
+    void ExecuteRespawn();
+
 private:
 
     class AProcedurallyGeneratedMap* ProceduralMap;
     class APickupManager* PickupManager;
+
+    TArray<class AMultiplayerPlayerController*> RespawnQueue;
+
+    TArray<FTimerHandle> TimerQueue;
 
 };
