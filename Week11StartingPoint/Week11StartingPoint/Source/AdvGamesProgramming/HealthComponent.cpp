@@ -26,8 +26,6 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = MaxHealth;
-	// ...
-	
 }
 
 
@@ -35,6 +33,7 @@ void UHealthComponent::BeginPlay()
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    UpdateHealthBar();
 
 	//Health Debug messages
 	/*
@@ -60,6 +59,7 @@ void UHealthComponent::OnTakeDamage(float Damage)
 		CurrentHealth = 0;
 		OnDeath();
 	}
+    UpdateHealthBar();
 }
 
 void UHealthComponent::OnDeath()
@@ -79,8 +79,9 @@ float UHealthComponent::HealthPercentageRemaining()
 void UHealthComponent::UpdateHealthBar()
 {
 	//If the owner of this health component is an autonomous proxy
-	//NOTE: Possible to use function GetOwnerRole() as well! If you look at the 
-	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	//NOTE: Possible to use function GetOwnerRole() as well! If you look at the
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy ||
+	    (GetOwner()->GetLocalRole() == ROLE_Authority && Cast<APawn>(GetOwner())->IsLocallyControlled()))
 	{
 		//Find the hud associated to this player
 		APlayerHUD* HUD = Cast<APlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());

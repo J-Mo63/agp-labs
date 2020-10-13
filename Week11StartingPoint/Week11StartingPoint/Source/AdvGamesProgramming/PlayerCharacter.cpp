@@ -129,7 +129,7 @@ void APlayerCharacter::OnDeath()
 void APlayerCharacter::HidePlayerHUD_Implementation(bool bSetHUDVisibility)
 {
 	//Get the player controller then the player hud of the autonomous proxy
-	if (GetLocalRole() == ROLE_AutonomousProxy)
+	if (GetLocalRole() == ROLE_AutonomousProxy || GetLocalRole() == ROLE_Authority && IsLocallyControlled())
 	{
 		if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 		{
