@@ -18,6 +18,7 @@ UMainGameInstance::UMainGameInstance(const FObjectInitializer& ObjectInitialize)
     OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnStartSessionComplete);
     OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnFindSessionsComplete);
     OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnDestroySessionComplete);
+    OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnJoinSessionComplete);
 }
 
 void UMainGameInstance::Init()
@@ -132,6 +133,7 @@ void UMainGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
         UE_LOG(LogTemp, Warning, TEXT("%i Sessions Found"), SessionSearch->SearchResults.Num())
         if (SessionSearch->SearchResults.Num() > 0)
         {
+            OnJoinSessionCompleteDelegateHandle = SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegate);
             FOnlineSessionSearchResult SessionResult = SessionSearch->SearchResults[0];
             SessionInterface->JoinSession(*GetFirstGamePlayer()->GetPreferredUniqueNetId(),
                                           *SessionResult.Session.GetSessionIdStr(), SessionResult);
@@ -140,6 +142,22 @@ void UMainGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
     else
     {
         UE_LOG(LogTemp, Error, TEXT("No Sessions could be found"))
+    }
+}
+
+void UMainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+    if (SessionInterface.IsValid() && Result == EOnJoinSessionCompleteResult::Success)
+    {
+        SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegateHandle);
+
+        UE_LOG(LogTemp, Warning, TEXT("Session joined successfully"))
+        FString TravelURL;
+        if (SessionInterface->GetResolvedConnectString(SessionName, TravelURL))
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Client travelling"))
+            GetFirstLocalPlayerController()->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
+        }
     }
 }
 

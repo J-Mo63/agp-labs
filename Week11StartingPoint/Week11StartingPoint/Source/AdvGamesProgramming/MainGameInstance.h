@@ -36,6 +36,8 @@ private:
     void OnStartSessionComplete(FName SessionName, bool bSuccess);
 
     void OnDestroySessionComplete(FName SessionName, bool bSuccess);
+	
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
     void OnFindSessionsComplete(bool bWasSuccessful);
 
@@ -51,11 +53,13 @@ private:
     FOnStartSessionCompleteDelegate OnStartSessionCompleteDelegate;
     FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
     FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;
+	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;
 
     FDelegateHandle OnCreateSessionCompleteDelegateHandle;
     FDelegateHandle OnStartSessionCompleteDelegateHandle;
     FDelegateHandle OnFindSessionsCompleteDelegateHandle;
     FDelegateHandle OnDestroySessionCompleteDelegateHandle;
+	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
 
     TSharedPtr<class FOnlineSessionSearch> SessionSearch;
     TSharedPtr<class FOnlineSessionSettings> SessionSettings;
