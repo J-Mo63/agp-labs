@@ -29,6 +29,9 @@ private:
     UPROPERTY(meta=(BindWidget))
     UButton* ButtonQuit;
 
+    UPROPERTY()
+    class UMainGameInstance* GameInstance;
+
     UFUNCTION()
     void OnHostButtonPressed();
 
