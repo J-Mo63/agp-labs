@@ -13,12 +13,6 @@ UMainGameInstance::UMainGameInstance(const FObjectInitializer& ObjectInitialize)
 {
     static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuWidgetObject(TEXT("/Game/Widgets/MainMenuWidget"));
     MainMenuWidgetClass = MainMenuWidgetObject.Class;
-
-    OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnCreateSessionComplete);
-    OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnStartSessionComplete);
-    OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnFindSessionsComplete);
-    OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnDestroySessionComplete);
-    OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UMainGameInstance::OnJoinSessionComplete);
 }
 
 void UMainGameInstance::Init()
@@ -36,10 +30,11 @@ void UMainGameInstance::Init()
     }
 
     SessionInterface = Subsystem->GetSessionInterface();
-//    SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMainGameInstance::OnFindSessionsComplete);
-//    SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UMainGameInstance::OnCreateSessionComplete);
-//    SessionInterface->OnStartSessionCompleteDelegates.AddUObject(this, &UMainGameInstance::OnStartSessionComplete);
-//    SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UMainGameInstance::OnDestroySessionComplete);
+    SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMainGameInstance::OnFindSessionsComplete);
+    SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UMainGameInstance::OnCreateSessionComplete);
+    SessionInterface->OnStartSessionCompleteDelegates.AddUObject(this, &UMainGameInstance::OnStartSessionComplete);
+    SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UMainGameInstance::OnDestroySessionComplete);
+    SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UMainGameInstance::OnJoinSessionComplete);
 }
 
 void UMainGameInstance::LoadMenu()
@@ -70,24 +65,20 @@ void UMainGameInstance::CreateSession(FName SessionName)
         SessionSettings->NumPublicConnections = 3;
         SessionSettings->NumPrivateConnections = 3;
         SessionSettings->bAllowJoinInProgress = true;
-        OnCreateSessionCompleteDelegateHandle = SessionInterface->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
         SessionInterface->CreateSession(*GetFirstGamePlayer()->GetPreferredUniqueNetId(), SessionName, *SessionSettings);
     }
 }
 
 void UMainGameInstance::OnCreateSessionComplete(FName SessionName, bool bSuccess)
 {
-    SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
     if (SessionInterface.IsValid() && bSuccess)
     {
         UE_LOG(LogTemp, Warning, TEXT("Session Created Successfully"))
-        OnStartSessionCompleteDelegateHandle = SessionInterface->AddOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegate);
         SessionInterface->StartSession(SessionName);
     }
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Session is already in use, restarting session"))
-        OnDestroySessionCompleteDelegateHandle = SessionInterface->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
         SessionInterface->DestroySession(SessionName);
     }
 }
@@ -97,7 +88,6 @@ void UMainGameInstance::OnStartSessionComplete(FName SessionName, bool bSuccess)
     if (bSuccess)
     {
         UE_LOG(LogTemp, Warning, TEXT("Session Started Successfully"))
-        SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegateHandle);
         FInputModeGameOnly InputMode;
         InputMode.SetConsumeCaptureMouseDown(true);
         GetFirstLocalPlayerController()->bShowMouseCursor = false;
@@ -120,20 +110,17 @@ void UMainGameInstance::JoinRunningSession(FName SessionName)
         SessionSearch->MaxSearchResults = 20;
         SessionSearch->PingBucketSize = 50;
         TSharedRef<FOnlineSessionSearch> SearchSettingsRef = SessionSearch.ToSharedRef();
-        OnFindSessionsCompleteDelegateHandle = SessionInterface->AddOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegate);
         SessionInterface->FindSessions(*GetFirstGamePlayer()->GetPreferredUniqueNetId(), SearchSettingsRef);
     }
 }
 
 void UMainGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 {
-    SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
     if (SessionInterface.IsValid() && SessionSearch.IsValid())
     {
         UE_LOG(LogTemp, Warning, TEXT("%i Sessions Found"), SessionSearch->SearchResults.Num())
         if (SessionSearch->SearchResults.Num() > 0)
         {
-            OnJoinSessionCompleteDelegateHandle = SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegate);
             FOnlineSessionSearchResult SessionResult = SessionSearch->SearchResults[0];
             SessionInterface->JoinSession(*GetFirstGamePlayer()->GetPreferredUniqueNetId(),
                                           *SessionResult.Session.GetSessionIdStr(), SessionResult);
@@ -149,8 +136,6 @@ void UMainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionC
 {
     if (SessionInterface.IsValid() && Result == EOnJoinSessionCompleteResult::Success)
     {
-        SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegateHandle);
-
         UE_LOG(LogTemp, Warning, TEXT("Session joined successfully"))
         FString TravelURL;
         if (SessionInterface->GetResolvedConnectString(SessionName, TravelURL))
@@ -165,7 +150,6 @@ void UMainGameInstance::OnDestroySessionComplete(FName SessionName, bool bSucces
 {
     if (bSuccess)
     {
-        SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegateHandle);
         CreateSession(SessionName);
     }
     else
